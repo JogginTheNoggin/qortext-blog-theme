@@ -1,0 +1,340 @@
+{{!< default}} <section
+    class="relative bg-gradient-to-b from-white via-zinc-100 to-zinc-200 border-b border-zinc-200 overflow-hidden">
+    {{#get "posts" filter="featured:true" limit="5" include="tags,authors"}}
+    {{#if posts}}
+    <!-- Increased mobile height to prevent cutoff -->
+    <div id="hero-slider" class="relative min-h-[900px] md:min-h-[600px] flex items-center">
+        <!-- Slides Container -->
+        <div class="slider-track w-full h-full">
+            {{#foreach posts}}
+            <div class="slide absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out {{#if @first}}opacity-100 z-10{{else}}opacity-0 z-0{{/if}}"
+                data-index="{{@index}}">
+                <!-- Content Layout -->
+                <div
+                    class="max-w-7xl mx-auto px-6 h-full flex flex-col md:flex-row items-center gap-12 pt-24 pb-12 md:pt-32 md:pb-24">
+
+                    <!-- Text Content (Left) -->
+                    <div class="w-full md:w-1/2 relative z-20 flex flex-col justify-center items-start">
+                        {{#if tags}}
+                        <div class="flex items-center gap-2 mb-6">
+                            <span class="w-8 h-[1px] bg-brand-cyan"></span>
+                            <span
+                                class="text-brand-qortextcyan font-mono text-xs uppercase tracking-widest font-bold">{{primary_tag.name}}</span>
+                        </div>
+                        {{/if}}
+
+                        <h2 class="text-4xl md:text-6xl font-bold text-zinc-900 leading-[1.1] tracking-tight mb-6">
+                            <a href="{{url}}" class="hover:text-zinc-700 transition-colors">{{title}}</a>
+                        </h2>
+
+                        <p class="text-lg text-zinc-500 leading-relaxed mb-8 max-w-lg font-light">
+                            {{excerpt words="30"}}...
+                        </p>
+
+                        <a href="{{url}}"
+                            class="group inline-flex items-center gap-3 px-6 py-3 bg-zinc-900 text-white rounded-lg font-medium hover:bg-zinc-800 transition-all">
+                            Read Article
+                            <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                            </svg>
+                        </a>
+                    </div>
+
+                    <!-- Image Content (Right) -->
+                    <div class="w-full md:w-1/2 relative z-10">
+                        <div
+                            class="aspect-[4/3] md:aspect-[3/2] w-full rounded-2xl overflow-hidden shadow-2xl relative group">
+                            {{#if feature_image}}
+                            <div
+                                class="absolute inset-0 bg-zinc-900/10 group-hover:bg-zinc-900/0 transition-colors duration-500 z-10">
+                            </div>
+                            <img src="{{feature_image}}" alt="{{title}}"
+                                class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
+                            {{else}}
+                            <div class="w-full h-full bg-zinc-200 flex items-center justify-center">
+                                <svg class="w-20 h-20 text-zinc-300" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <rect width="18" height="18" x="3" y="3" rx="2" />
+                                    <path d="M3 9h18" />
+                                    <path d="M9 21V9" />
+                                </svg>
+                            </div>
+                            {{/if}}
+                        </div>
+                        <!-- Decorative Elements -->
+                        <div class="absolute -bottom-6 -right-6 w-24 h-24 bg-brand-cyan/10 rounded-full blur-xl -z-10">
+                        </div>
+                        <div class="absolute -top-6 -left-6 w-32 h-32 bg-brand-purple/10 rounded-full blur-xl -z-10">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{/foreach}}
+        </div>
+
+        <!-- Controls -->
+        <div class="absolute bottom-8 right-6 md:bottom-12 md:right-12 z-30 flex items-center gap-4">
+            <button id="prev-slide"
+                class="p-3 rounded-full border border-zinc-300 text-zinc-600 hover:bg-zinc-100 hover:border-zinc-400 hover:text-zinc-900 transition-all focus:outline-none"
+                aria-label="Previous Post">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+            </button>
+            <button id="next-slide"
+                class="p-3 rounded-full border border-zinc-300 text-zinc-600 hover:bg-zinc-100 hover:border-zinc-400 hover:text-zinc-900 transition-all focus:outline-none"
+                aria-label="Next Post">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Background Elements -->
+        <div class="absolute inset-0 grid-bg opacity-30 pointer-events-none"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const slides = document.querySelectorAll('.slide');
+            const nextBtn = document.getElementById('next-slide');
+            const prevBtn = document.getElementById('prev-slide');
+            let currentSlide = 0;
+            const totalSlides = slides.length;
+
+            if (totalSlides === 0) return;
+
+            function showSlide(index) {
+                slides.forEach(slide => {
+                    slide.classList.remove('opacity-100', 'z-10');
+                    slide.classList.add('opacity-0', 'z-0');
+                });
+
+                slides[index].classList.remove('opacity-0', 'z-0');
+                slides[index].classList.add('opacity-100', 'z-10');
+            }
+
+            function nextSlide() {
+                currentSlide = (currentSlide + 1) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            function prevSlide() {
+                currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+                showSlide(currentSlide);
+            }
+
+            nextBtn.addEventListener('click', () => {
+                nextSlide();
+                resetTimer();
+            });
+
+            prevBtn.addEventListener('click', () => {
+                prevSlide();
+                resetTimer();
+            });
+
+            // Auto-play
+            let slideInterval = setInterval(nextSlide, 6000);
+
+            function resetTimer() {
+                clearInterval(slideInterval);
+                slideInterval = setInterval(nextSlide, 6000);
+            }
+        });
+    </script>
+    {{else}}
+    <!-- Fallback if no featured posts -->
+    <div
+        class="relative pt-32 pb-24 md:pt-48 md:pb-32 px-6 overflow-hidden flex flex-col justify-center border-b border-zinc-100 text-center">
+        <div class="max-w-3xl mx-auto z-10">
+            <h1 class="text-5xl md:text-7xl font-bold text-zinc-900 mb-6">Qortext Blog</h1>
+            <p class="text-zinc-500 text-lg">{{@site.description}}</p>
+        </div>
+    </div>
+    {{/if}}
+    {{/get}}
+    </section>
+
+    <section class="py-24 bg-white relative">
+        <div class="max-w-6xl mx-auto px-6">
+            <div id="post-grid" class="grid md:grid-cols-3 gap-8">
+                {{#foreach posts}}
+                <a href="{{url}}" class="group flex flex-col h-full">
+                    <!-- Image / Icon Container -->
+                    <div
+                        class="aspect-video w-full bg-zinc-50 rounded border border-zinc-200 overflow-hidden mb-5 group-hover:border-brand-cyan/30 transition-colors relative shadow-sm">
+                        {{#if feature_image}}
+                        <img src="{{feature_image}}" alt="{{title}}"
+                            class="w-full h-full object-cover opacity-100 group-hover:scale-105 transition-all duration-500" />
+                        {{else}}
+                        <div
+                            class="w-full h-full flex items-center justify-center text-zinc-300 group-hover:text-brand-cyan/50 transition-colors">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1">
+                                <rect width="18" height="18" x="3" y="3" rx="2" />
+                                <path d="M3 9h18" />
+                                <path d="M9 21V9" />
+                            </svg>
+                        </div>
+                        {{/if}}
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex flex-col flex-grow">
+                        <div class="flex items-center gap-3 text-xs font-mono text-zinc-500 mb-3">
+                            <time datetime="{{date format=" YYYY-MM-DD"}}">{{date format="MMM D, YYYY"}}</time>
+                            {{#if tags}}
+                            <span>/</span>
+                            <span
+                                class="text-brand-cyan font-semibold uppercase tracking-wider">{{primary_tag.name}}</span>
+                            {{/if}}
+                        </div>
+
+                        <h2
+                            class="text-xl font-bold text-zinc-900 mb-3 leading-tight group-hover:text-brand-cyan transition-colors">
+                            {{title}}
+                        </h2>
+
+                        <p class="text-sm text-zinc-500 leading-relaxed line-clamp-3 mb-4 flex-grow">
+                            {{excerpt words="25"}}
+                        </p>
+
+                        <div class="flex items-center text-xs font-bold text-zinc-900 mt-auto pt-2">
+                            <span
+                                class="border-b border-transparent group-hover:border-brand-cyan transition-colors">Read
+                                Article</span>
+                            <svg class="w-3 h-3 ml-1 transform group-hover:translate-x-1 transition-transform"
+                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </a>
+                {{/foreach}}
+            </div>
+        </div>
+
+        <div class="max-w-6xl mx-auto px-6 mt-16 text-center">
+            <!-- Hidden Pagination for Data -->
+            <div class="hidden pagination-data">
+                {{pagination}}
+            </div>
+
+            <!-- Load More Button -->
+            <button id="load-more"
+                class="px-8 py-3 bg-white border border-zinc-200 text-zinc-900 font-bold rounded-lg hover:bg-zinc-50 hover:border-zinc-300 transition-all shadow-sm">
+                Load More Articles
+            </button>
+        </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const loadMoreBtn = document.getElementById('load-more');
+                const postGrid = document.getElementById('post-grid');
+                let nextPageLink = document.querySelector('link[rel="next"]'); // Ghost adds this to head
+
+                // If not in head, try to find it in the hidden pagination block if theme renders it there
+                if (!nextPageLink) {
+                    const paginationNext = document.querySelector('.pagination-data .older-posts'); // Standard Ghost class
+                    if (paginationNext) {
+                        nextPageLink = { href: paginationNext.href };
+                    }
+                }
+
+                if (!nextPageLink) {
+                    loadMoreBtn.style.display = 'none';
+                    return;
+                }
+
+                loadMoreBtn.addEventListener('click', async function () {
+                    const nextUrl = nextPageLink.href;
+                    if (!nextUrl) return;
+
+                    loadMoreBtn.innerHTML = 'Loading...';
+                    loadMoreBtn.disabled = true;
+
+                    try {
+                        const response = await fetch(nextUrl);
+                        const text = await response.text();
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(text, 'text/html');
+
+                        // Select new posts
+                        const newPosts = doc.querySelectorAll('#post-grid > *');
+
+                        newPosts.forEach(post => {
+                            post.style.opacity = '0';
+                            postGrid.appendChild(post);
+
+                            // Simple fade in
+                            requestAnimationFrame(() => {
+                                post.style.transition = 'opacity 0.5s ease-out';
+                                post.style.opacity = '1';
+                            });
+                        });
+
+                        // Update next page link
+                        const newNextLink = doc.querySelector('link[rel="next"]');
+                        const newPaginationNext = doc.querySelector('.pagination-data .older-posts');
+
+                        if (newNextLink) {
+                            nextPageLink = newNextLink;
+                        } else if (newPaginationNext) {
+                            nextPageLink = { href: newPaginationNext.href };
+                        } else {
+                            nextPageLink = null;
+                            loadMoreBtn.style.display = 'none'; // No more pages
+                        }
+
+                    } catch (error) {
+                        console.error('Error loading posts:', error);
+                        loadMoreBtn.innerText = 'Error loading. Try again.';
+                    } finally {
+                        if (nextPageLink) {
+                            loadMoreBtn.innerHTML = 'Load More Articles';
+                            loadMoreBtn.disabled = false;
+                        }
+                    }
+                });
+            });
+        </script>
+        </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section
+        class="py-24 bg-gradient-to-b from-white via-zinc-100 to-zinc-200 relative overflow-hidden border-t border-zinc-200">
+        <!-- Background Glow -->
+        <div
+            class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-brand-cyan/5 blur-[100px] rounded-full pointer-events-none">
+        </div>
+
+        <div class="max-w-4xl mx-auto px-6 relative z-10 text-center">
+            <h2 class="text-3xl md:text-5xl font-bold text-zinc-900 mb-6 tracking-tight">Stay ahead of the curve.</h2>
+            <p class="text-zinc-500 text-lg mb-10 max-w-xl mx-auto font-light">
+                Get the latest insights on micro-intelligence and agentic workflows delivered straight to your inbox.
+            </p>
+
+            <form data-members-form="subscribe" class="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto">
+                <div class="flex-grow relative">
+                    <input data-members-email type="email" placeholder="enter your email" required="true"
+                        class="w-full px-5 py-4 bg-white border border-zinc-200 rounded-lg text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan transition-all shadow-sm" />
+                </div>
+                <button type="submit"
+                    class="px-8 py-4 bg-brand-cyan text-white font-bold rounded-lg hover:bg-[#00d2ff] transition-all shadow-[0_4px_14px_0_rgba(6,182,212,0.39)] hover:shadow-[0_6px_20px_rgba(6,182,212,0.23)] hover:-translate-y-[1px]">
+                    Subscribe
+                </button>
+            </form>
+
+            <div class="message-success hidden mt-4 text-brand-cyan font-medium">
+                Great! Check your inbox and click the link to confirm your subscription.
+            </div>
+            <div class="message-error hidden mt-4 text-red-500 font-medium">
+                Please enter a valid email address!
+            </div>
+        </div>
+    </section>

@@ -1,0 +1,12 @@
+<ul class="flex items-center gap-8 font-medium">
+    {{#foreach navigation}}
+    <li class="{{link_class for=(url) class=(concat " nav-" slug)}} relative group">
+        <a href="{{url}}"
+            class="text-zinc-600 hover:text-zinc-900 transition-colors {{#if current}}text-zinc-900 font-semibold{{/if}}">
+            {{label}}
+        </a>
+        <span
+            class="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-cyan transition-all duration-300 group-hover:w-full {{#if current}}w-full{{/if}}"></span>
+    </li>
+    {{/foreach}}
+</ul>
